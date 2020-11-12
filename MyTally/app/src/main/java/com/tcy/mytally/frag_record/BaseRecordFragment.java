@@ -2,16 +2,22 @@ package com.tcy.mytally.frag_record;
 
 
 import android.accounts.Account;
+import android.content.Context;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Message;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -22,6 +28,7 @@ import com.tcy.mytally.R;
 import com.tcy.mytally.db.AccountBean;
 import com.tcy.mytally.db.DBManger;
 import com.tcy.mytally.db.TypeBean;
+import com.tcy.mytally.util.BeizhuDialog;
 import com.tcy.mytally.util.KeyBoardUtil;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +40,7 @@ import java.util.List;
 /**
  * 记录页面当中的支出模块
  */
-public abstract class BaseRecordFragment extends Fragment {
+public abstract class BaseRecordFragment extends Fragment implements View.OnClickListener {
 
     KeyboardView keyboardView;
     EditText moneyEt;
@@ -146,10 +153,49 @@ public abstract class BaseRecordFragment extends Fragment {
             }
         });
 
+        //给beizhu设置点击事件
+        beizhuTv.setOnClickListener(this);
+
+        //给time设置点击事件
+        timeTv.setOnClickListener(this);
+
     }
 
     /*让子类一定要重写这个方法*/
     /*而且抽象方法一定要在抽象类中*/
     public abstract void saveToDB();
+
+
+    //重写onClick方法
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.frag_record_tv_beizhu:
+                showBZDialog();
+                break;
+            case R.id.frag_record_tv_time:
+
+                break;
+        }
+    }
+
+    /*弹出备注对话框*/
+    public void showBZDialog() {
+        final BeizhuDialog dialog = new BeizhuDialog(getContext());
+        dialog.show();
+        dialog.setDialogSize();
+        dialog.setOnEnsureListener(new BeizhuDialog.onEnsureListener() {
+            @Override
+            public void onEnsure() {
+                String text = dialog.getEditText();
+                if (!TextUtils.isEmpty(text)) {
+                    beizhuTv.setText(text);
+                    accountBean.setBeizhu(text);
+                }
+                dialog.cancel();//执行完之后取消对话框
+            }
+        });
+    }
+
 
 }

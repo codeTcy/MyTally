@@ -23,6 +23,8 @@ public class InComeFragment extends BaseRecordFragment {
 
     @Override
     public void saveToDB() {
-
+        //把accountBean剩下没有给值的元素设置一下
+        accountBean.setKind(1);
+        DBManger.insertItemToAccounttb(accountBean);
     }
 }

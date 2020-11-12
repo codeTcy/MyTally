@@ -22,6 +22,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                 ", typename varchar(10), imageId integer, sImageId integer, kind integer)";
         db.execSQL(sql);
         insertType(db);
+
+        //创建记账表
+        sql = "create table accounttb(id integer primary key autoincrement," +
+                "typename varchar(10),sImageId integer, beizhu varchar(80), money float, time varchar(60), " +
+                "year integer, month integer, day integer, kind integer)";
+        db.execSQL(sql);
+
     }
 
     //插入数据

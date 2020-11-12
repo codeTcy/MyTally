@@ -1,5 +1,6 @@
 package com.tcy.mytally.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,7 +21,6 @@ public class DBManger {
         DBOpenHelper helper = new DBOpenHelper(context);//得到帮助类对象
         db = helper.getWritableDatabase();//得到数据库对象
     }
-
 
     /*
      * 读取数据库里的数据，写入内存集合里面
@@ -43,5 +43,25 @@ public class DBManger {
         }
 
         return list;
+    }
+
+    /*
+     * 向记账表当中插入一条元素
+     */
+    public static void insertItemToAccounttb(AccountBean accountBean) {
+        ContentValues values = new ContentValues();
+        //把id忽略，还有9个字段
+        values.put("typename", accountBean.getTypename());
+        values.put("sImageId", accountBean.getsImageId());
+        values.put("beizhu", accountBean.getBeizhu());
+        values.put("money", accountBean.getMoney());
+        values.put("time", accountBean.getTime());
+        values.put("year", accountBean.getYear());
+        values.put("month", accountBean.getMonth());
+        values.put("day", accountBean.getDay());
+        values.put("kind", accountBean.getKind());
+
+        db.insert("accounttb", null, values);
+
     }
 }

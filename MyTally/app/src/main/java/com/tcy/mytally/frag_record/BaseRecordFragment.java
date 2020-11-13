@@ -30,6 +30,7 @@ import com.tcy.mytally.db.DBManger;
 import com.tcy.mytally.db.TypeBean;
 import com.tcy.mytally.util.BeizhuDialog;
 import com.tcy.mytally.util.KeyBoardUtil;
+import com.tcy.mytally.util.SelectTimeDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -174,9 +175,27 @@ public abstract class BaseRecordFragment extends Fragment implements View.OnClic
                 showBZDialog();
                 break;
             case R.id.frag_record_tv_time:
-
+                showTimeDialog();
                 break;
         }
+    }
+
+    /*弹出时间对话框*/
+    public void showTimeDialog() {
+        SelectTimeDialog timeDialog = new SelectTimeDialog(getContext());
+        timeDialog.show();
+        //设定确定按钮被点击了的监听器
+        timeDialog.setOnEnsureListener(new SelectTimeDialog.OnEnsureListener() {
+            @Override
+            public void onEnsure(String time, int year, int month, int day) {
+                timeTv.setText(time);
+                accountBean.setTime(time);
+                accountBean.setYear(year);
+                accountBean.setMonth(month);
+                accountBean.setDay(day);
+            }
+        });
+
     }
 
     /*弹出备注对话框*/

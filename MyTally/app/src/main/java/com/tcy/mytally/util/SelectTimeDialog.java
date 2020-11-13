@@ -3,6 +3,7 @@ package com.tcy.mytally.util;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,11 +38,28 @@ public class SelectTimeDialog extends Dialog implements View.OnClickListener {
         ensureBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
 
+        //隐藏头布局
+        hideDatePickerHeader();
+
     }
 
     public SelectTimeDialog(@NonNull Context context) {
         super(context);
     }
+
+
+    //接口回调
+    public interface OnEnsureListener {
+        public void onEnsure(String time, int year, int month, int day);
+    }
+
+    OnEnsureListener onEnsureListener;
+
+    public void setOnEnsureListener(OnEnsureListener onEnsureListener) {
+        this.onEnsureListener = onEnsureListener;
+    }
+
+    //以上为接口回调
 
     @Override
     public void onClick(View v) {
@@ -50,7 +68,49 @@ public class SelectTimeDialog extends Dialog implements View.OnClickListener {
                 cancel();
                 break;
             case R.id.dialog_time_btn_ensure:
+                int year = datePicker.getYear();//选中年份
+                int month = datePicker.getMonth() + 1;//选中月份【要加1】
+                int day = datePicker.getDayOfMonth();//选中日期
+                String monthStr = String.valueOf(month);
+                if (month < 10) {
+                    monthStr = "0" + month;
+                }
+                String dayStr = String.valueOf(day);
+                if (day < 10) {
+                    dayStr = "0" + day;
+                }
+                //获取输入的小时和分钟
+                String hourStr = hourEt.getText().toString();
+                String minuteStr = minuteEt.getText().toString();
+                int hour = 0;
+                if (!TextUtils.isEmpty(hourStr)) {
+                    hour = Integer.parseInt(hourStr);
+                    hour = hour & 24;//防止超过24小时
+                }
 
+                int minute = 0;
+                if (!TextUtils.isEmpty(minuteStr)) {
+                    minute = Integer.parseInt(minuteStr);
+                    minute = minute % 60;//防止超过60
+                }
+
+                hourStr = String.valueOf(hour);
+                minuteStr = String.valueOf(minute);
+                if (hour < 10) {
+                    hourStr = "0" + hour;
+                }
+
+                if (minute < 10) {
+                    minuteStr = "0" + minute;
+                }
+
+                String timeFormat = year + "年" + monthStr + "月" + dayStr + "日 " + hourStr + ":" + minuteStr;
+
+                if (onEnsureListener != null) {
+                    onEnsureListener.onEnsure(timeFormat, year, month, day);
+                }
+
+                cancel();
                 break;
         }
     }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecordActivity extends AppCompatActivity {
+
     TabLayout tabLayout;
     ViewPager viewPager;
 

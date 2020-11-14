@@ -62,6 +62,32 @@ public class DBManger {
         values.put("kind", accountBean.getKind());
 
         db.insert("accounttb", null, values);
+    }
 
+    /*
+     * 获取记账表中某一天的所有支出
+     */
+    public static List<AccountBean> getAccountListFromAccounttb(int year, int month, int day) {
+        List<AccountBean> list = new ArrayList<>();
+
+        //以下进行查询
+        String sql = "select * from accounttb where year=? and month=? and day=? order by id desc";
+        //倒叙排列,最先获取的在最下面
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + "", day + ""});
+        //循环读取游标内容，存储到对象当中\
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex("id"));
+            String typename = cursor.getString(cursor.getColumnIndex("typename"));
+            String beizhu = cursor.getString(cursor.getColumnIndex("beizhu"));
+            String time = cursor.getString(cursor.getColumnIndex("time"));
+            int sImageId = cursor.getInt(cursor.getColumnIndex("sImageId"));
+            int kind = cursor.getInt(cursor.getColumnIndex("kind"));
+            float money = cursor.getFloat(cursor.getColumnIndex("money"));
+            //year,month,day已经获取了,所以不用获取
+            AccountBean bean = new AccountBean(id, typename, sImageId, beizhu, money, time, year, month, day, kind);
+            list.add(bean);//加入到集合当中
+        }
+
+        return list;
     }
 }

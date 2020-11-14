@@ -58,8 +58,8 @@
         android:layout_toLeftOf="@id/main_btn_more"
         android:background="@drawable/main_recordbtn_bg"
         android:drawableLeft="@mipmap/edit"
+        android:gravity="center_vertical"
         android:text="@string/editOne"
         android:textColor="@color/white"
-        android:textStyle="bold"
-        android:gravity="center_vertical"/>
+        android:textStyle="bold" />
 </RelativeLayout>

@@ -90,4 +90,53 @@ public class DBManger {
 
         return list;
     }
+
+    /*
+     * 获取某一天的支出或者收入的总金额,传入kind ：支出----0  收入----1
+     */
+    public static float getSumMoneyOneDay(int year, int month, int day, int kind) {
+        float total = 0.0f;
+
+        String sql = "select sum(money) from accounttb where year=? and month=? and day=? and kind=?";
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + "", day + "", kind + ""});
+        //遍历
+        if (cursor.moveToFirst()) {
+            float sum = cursor.getFloat(cursor.getColumnIndex("sum(money)"));
+            total = sum;
+        }
+        return total;
+    }
+
+    /*
+     * 获取某一个月的支出或者收入的总金额,传入kind ：支出----0  收入----1
+     */
+    public static float getSumMoneyOneMonth(int year, int month, int kind) {
+        float total = 0.0f;
+
+        String sql = "select sum(money) from accounttb where year=? and month=? and kind=?";
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + "", kind + ""});
+        //遍历
+        if (cursor.moveToFirst()) {
+            float sum = cursor.getFloat(cursor.getColumnIndex("sum(money)"));
+            total = sum;
+        }
+        return total;
+    }
+
+    /*
+     * 获取某一年的支出或者收入的总金额,传入kind ：支出----0  收入----1
+     */
+    public static float getSumMoneyOneYear(int year, int kind) {
+        float total = 0.0f;
+
+        String sql = "select sum(money) from accounttb where year=? and kind=?";
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", kind + ""});
+        //遍历
+        if (cursor.moveToFirst()) {
+            float sum = cursor.getFloat(cursor.getColumnIndex("sum(money)"));
+            total = sum;
+        }
+        return total;
+    }
+
 }

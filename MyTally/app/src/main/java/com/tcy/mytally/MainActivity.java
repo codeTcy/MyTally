@@ -2,20 +2,29 @@ package com.tcy.mytally;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.tcy.mytally.adapter.AccountAdapter;
 import com.tcy.mytally.db.AccountBean;
 import com.tcy.mytally.db.DBManger;
+import com.tcy.mytally.util.BudgetDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     ListView todayLV;//展示今日收支情况的listView
 
@@ -28,21 +37,85 @@ public class MainActivity extends AppCompatActivity {
     //
     int year, month, day;
 
+    //头布局
+    View headerView;
+    //以下为头布局相关控件
+    TextView topOutTv, topInTv, topBudgetTv, topConditionTv;
+    ImageView topShowIv;
+
+    //以下为非头布局相关控件
+    ImageView searchIv;
+    Button editBtn;
+    ImageButton moreBtn;
+
+    //默认为睁着眼睛
+    boolean ishow = true;
+
+    //用sharePreference去记录,因为数据量少,且要永久存储
+    SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        todayLV = findViewById(R.id.main_lv);
+        //初始化自带的view的方法
+        initView();
+
+        //添加ListView头布局
+        addLVheaderView();
+
         //设置时间
         initTime();
+
+        //初始化sharePerferences
+        initPF();
 
         //初始化数据源，设置适配器,加载每一行数据到List当中
         mDatas = new ArrayList<>();
         adapter = new AccountAdapter(this, mDatas);
         todayLV.setAdapter(adapter);
 
+
     }
 
+    /*初始化共享数据*/
+    private void initPF() {
+        preferences = getSharedPreferences("budget", Context.MODE_PRIVATE);
+    }
+
+    /*初始化自带的view的方法*/
+    private void initView() {
+        todayLV = findViewById(R.id.main_lv);
+        editBtn = findViewById(R.id.main_btn_edit);
+        moreBtn = findViewById(R.id.main_btn_more);
+        searchIv = findViewById(R.id.main_iv_search);
+        editBtn.setOnClickListener(this);
+        moreBtn.setOnClickListener(this);
+        searchIv.setOnClickListener(this);
+    }
+
+    /*添加ListView头布局*/
+    private void addLVheaderView() {
+        //将布局转化为View对象
+        headerView = getLayoutInflater().inflate(R.layout.item_mainlv_top, null);
+        //设置头布局
+        todayLV.addHeaderView(headerView);
+
+        //查找头布局需要用到的控件
+        topOutTv = headerView.findViewById(R.id.item_mainlv_top_tv_out);
+        topInTv = headerView.findViewById(R.id.item_mainlv_top_tv_in);
+        topBudgetTv = headerView.findViewById(R.id.item_mainlv_top_tv_budget);
+        topConditionTv = headerView.findViewById(R.id.item_mainlv_top_tv_day);
+        topShowIv = headerView.findViewById(R.id.item_mainlv_top_lv_hide);
+
+        //设置点击事件
+        topBudgetTv.setOnClickListener(this);
+        headerView.setOnClickListener(this);
+        topShowIv.setOnClickListener(this);
+
+    }
+
+    /*获取今日的具体时间*/
     private void initTime() {
         Calendar calendar = Calendar.getInstance();//得到日历对象
         year = calendar.get(Calendar.YEAR);
@@ -58,6 +131,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadDBdata();
+        setTopTVshow();
+    }
+
+    /*设置头布局内容中文本内容的显示*/
+    private void setTopTVshow() {
+        //获取今日支出和收入总金额,显示在view当中
+        float incomeOneDay = DBManger.getSumMoneyOneDay(year, month, day, 1);
+        float outcomeOneDay = DBManger.getSumMoneyOneDay(year, month, day, 0);
+        String infoOneDay = "今日支出 ￥" + outcomeOneDay + " 今日收入 ￥" + incomeOneDay;
+        topConditionTv.setText(infoOneDay);
+
+        //获取本月支出和收入总金额
+        float incomeOneMonth = DBManger.getSumMoneyOneMonth(year, month, 1);
+        float outcomeOneMonth = DBManger.getSumMoneyOneMonth(year, month, 0);
+        topInTv.setText("￥ " + incomeOneMonth);
+        topOutTv.setText("￥ " + outcomeOneMonth);
+
+        //设置显示预算剩余
+        float budgetMoney = preferences.getFloat("bmoney", 0.0f);//获取预算金额
+        if (budgetMoney == 0) {
+            topBudgetTv.setText("￥ 0");
+        } else {
+            float OutComeOneMonth = DBManger.getSumMoneyOneMonth(year, month, 0);
+            float restMoney = budgetMoney - OutComeOneMonth;//预算剩余=预算-支出
+            topBudgetTv.setText("￥ " + restMoney);
+        }
+
     }
 
     private void loadDBdata() {
@@ -68,8 +168,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void onClick(View view) {
-        switch (view.getId()) {
+    /*头布局相关的点击事件*/
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.main_iv_search:
 
                 break;
@@ -80,6 +182,66 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_btn_more:
 
                 break;
+            case R.id.item_mainlv_top_tv_budget:
+                showBudgetDialog();
+                break;
+            case R.id.item_mainlv_top_lv_hide:
+                //切换TextView明文和密文
+                toggleShow();
+                break;
+        }
+
+        if (v == headerView) {
+            //头布局被点击了
+
+        }
+    }
+
+
+    /*
+     * 显示"设置预算"对话框
+     * */
+    private void showBudgetDialog() {
+        BudgetDialog dialog = new BudgetDialog(this);
+        dialog.show();
+        dialog.setDialogSize();
+        dialog.setOnEnsureListener(new BudgetDialog.OnEnsureListener() {
+            @Override
+            public void OnEnsure(float money) {
+                //将预算金额写入到共享参数当中，进行存储
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putFloat("bmoney", money);
+                editor.commit();
+
+                //计算剩余金额
+                float OutComeOneMonth = DBManger.getSumMoneyOneMonth(year, month, 0);
+                float restMoney = money - OutComeOneMonth;//预算剩余=预算-支出
+                topBudgetTv.setText("￥ " + restMoney);
+
+            }
+        });
+    }
+
+    /*
+     * 点击头布局的眼睛时,如果原来时明文就加密,否则就显示
+     * */
+    private void toggleShow() {
+        if (ishow) {//明文--->密文
+            PasswordTransformationMethod instance = PasswordTransformationMethod.getInstance();//得到密文对象
+            topInTv.setTransformationMethod(instance);//设置隐藏
+            topOutTv.setTransformationMethod(instance);//设置隐藏
+            topBudgetTv.setTransformationMethod(instance);//设置隐藏
+            topShowIv.setImageResource(R.mipmap.ih_hide);
+            ishow = false;
+        } else {
+            //密文--->明文
+            HideReturnsTransformationMethod instance = HideReturnsTransformationMethod.getInstance();
+            topInTv.setTransformationMethod(instance);//设置显示
+            topOutTv.setTransformationMethod(instance);//设置显示
+            topBudgetTv.setTransformationMethod(instance);//设置显示
+            topShowIv.setImageResource(R.mipmap.ih_show);
+            ishow = true;
+
         }
     }
 }

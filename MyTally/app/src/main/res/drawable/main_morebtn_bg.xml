@@ -3,5 +3,5 @@
     android:shape="oval">
 
     <!--    填充颜色-->
-    <solid android:color="@color/green_006400" />
+    <solid android:color="@color/pink_fb7299" />
 </shape>

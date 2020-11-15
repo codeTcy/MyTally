@@ -22,6 +22,7 @@ import com.tcy.mytally.adapter.AccountAdapter;
 import com.tcy.mytally.db.AccountBean;
 import com.tcy.mytally.db.DBManger;
 import com.tcy.mytally.util.BudgetDialog;
+import com.tcy.mytally.util.MoreDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -220,7 +221,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
             case R.id.main_btn_more:
-
+                MoreDialog moreDialog = new MoreDialog(this);
+                moreDialog.show();
+                moreDialog.setDialogSize();
                 break;
             case R.id.item_mainlv_top_tv_budget:
                 showBudgetDialog();

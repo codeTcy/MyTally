@@ -83,7 +83,7 @@
             android:drawableLeft="@mipmap/ih_biaoge"
             android:drawablePadding="10dp"
             android:text="@string/see_excel"
-            android:textColor="@color/green_006400" />
+            android:textColor="@color/pink_fb7299" />
 
     </RelativeLayout>
 

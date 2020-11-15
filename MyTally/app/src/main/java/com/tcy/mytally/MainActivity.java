@@ -1,14 +1,17 @@
 package com.tcy.mytally;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -75,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new AccountAdapter(this, mDatas);
         todayLV.setAdapter(adapter);
 
-
     }
 
     /*初始化共享数据*/
@@ -92,6 +94,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editBtn.setOnClickListener(this);
         moreBtn.setOnClickListener(this);
         searchIv.setOnClickListener(this);
+        setLvLongClickListener();//设置ListView的长按事件
+    }
+
+    /*设置ListView的长按事件*/
+    private void setLvLongClickListener() {
+        todayLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    return false;//点击了头布局
+                }
+                int pos = position - 1;//position为1的时候，对应List里面为0
+                AccountBean clickBean = mDatas.get(pos);//获取正在被点击的这条信息
+                //弹出提示用户是否删除的对话框
+                showDeleteItemDialog(clickBean);
+                return false;
+            }
+        });
+    }
+
+    /*弹出是否删除某一条记录的对话框*/
+    private void showDeleteItemDialog(final AccountBean clickBean) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("提示信息").setMessage("您确定要删除这条记录嘛？")
+                .setNegativeButton("取消", null)
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //执行删除的操作
+                        int click_id = clickBean.getId();
+                        DBManger.deleteItemFromAccounttbById(click_id);
+                        mDatas.remove(clickBean);//移除该对象,实时刷新
+                        adapter.notifyDataSetChanged();//提示适配器更新数据
+                        setTopTVshow();//头布局也要更新
+                    }
+                });
+        builder.create().show();//显示对话框
     }
 
     /*添加ListView头布局*/
@@ -241,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             topBudgetTv.setTransformationMethod(instance);//设置显示
             topShowIv.setImageResource(R.mipmap.ih_show);
             ishow = true;
-
         }
     }
 }

@@ -21,6 +21,7 @@ import com.tcy.mytally.AboutActivity;
 import com.tcy.mytally.HistoryActivity;
 import com.tcy.mytally.R;
 import com.tcy.mytally.RecordActivity;
+import com.tcy.mytally.SettingActivity;
 
 public class MoreDialog extends Dialog implements View.OnClickListener {
 
@@ -60,7 +61,8 @@ public class MoreDialog extends Dialog implements View.OnClickListener {
                 getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_setting:
-
+                intent.setClass(getContext(), SettingActivity.class);
+                getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_record:
                 intent.setClass(getContext(), HistoryActivity.class);

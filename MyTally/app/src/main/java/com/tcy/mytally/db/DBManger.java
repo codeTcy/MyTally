@@ -224,4 +224,12 @@ public class DBManger {
         return yearList;
     }
 
+    /*
+     * 删除accounttb表格当中的所有数据
+     * */
+    public static void deleteAllAccounttb() {
+        String sql = "delete from accounttb";
+        db.execSQL(sql);
+    }
+
 }

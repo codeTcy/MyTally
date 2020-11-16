@@ -92,6 +92,35 @@ public class DBManger {
     }
 
     /*
+     * 获取记账表中某一个月的所有支出
+     */
+    public static List<AccountBean> getAccountListOneMonthFromAccounttb(int year, int month) {
+        List<AccountBean> list = new ArrayList<>();
+
+        //以下进行查询
+        String sql = "select * from accounttb where year=? and month=? order by id desc";
+        //倒叙排列,最先获取的在最下面
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + ""});
+        //循环读取游标内容，存储到对象当中
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex("id"));
+            String typename = cursor.getString(cursor.getColumnIndex("typename"));
+            String beizhu = cursor.getString(cursor.getColumnIndex("beizhu"));
+            String time = cursor.getString(cursor.getColumnIndex("time"));
+            int sImageId = cursor.getInt(cursor.getColumnIndex("sImageId"));
+            int kind = cursor.getInt(cursor.getColumnIndex("kind"));
+            float money = cursor.getFloat(cursor.getColumnIndex("money"));
+            int day = cursor.getInt(cursor.getColumnIndex("day"));
+            //year,month,day已经获取了,所以不用获取
+            AccountBean bean = new AccountBean(id, typename, sImageId, beizhu, money, time, year, month, day, kind);
+            list.add(bean);//加入到集合当中
+        }
+
+        return list;
+    }
+
+
+    /*
      * 获取某一天的支出或者收入的总金额,传入kind ：支出----0  收入----1
      */
     public static float getSumMoneyOneDay(int year, int month, int day, int kind) {
@@ -176,6 +205,23 @@ public class DBManger {
             list.add(bean);
         }
         return list;
+    }
+
+    /*
+     * 查询记账的表中有几个年份信息
+     * */
+    public static List<Integer> getYearListFromAccounttb() {
+        List<Integer> yearList = new ArrayList<>();
+
+        //
+        String sql = "select distinct(year) from accounttb order by year asc";//升序排
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            int year = cursor.getInt(cursor.getColumnIndex("year"));
+            yearList.add(year);
+        }
+
+        return yearList;
     }
 
 }

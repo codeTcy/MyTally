@@ -18,7 +18,9 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 import com.tcy.mytally.AboutActivity;
+import com.tcy.mytally.HistoryActivity;
 import com.tcy.mytally.R;
+import com.tcy.mytally.RecordActivity;
 
 public class MoreDialog extends Dialog implements View.OnClickListener {
 
@@ -61,7 +63,8 @@ public class MoreDialog extends Dialog implements View.OnClickListener {
 
                 break;
             case R.id.dialog_more_btn_record:
-
+                intent.setClass(getContext(), HistoryActivity.class);
+                getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_info:
 

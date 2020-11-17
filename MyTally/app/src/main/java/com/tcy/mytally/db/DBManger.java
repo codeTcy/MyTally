@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tcy.mytally.util.FloatUtils;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,6 +156,24 @@ public class DBManger {
     }
 
     /*
+     * 统计某月份支出或者收入情况有多少条  支出----0  收入----1
+     * */
+    public static int getCountItemOneMonth(int year, int month, int kind) {
+        int total = 0;
+
+        String sql = "select count(money) from accounttb where year=? and month=? and kind=?";
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + "", kind + ""});
+        //遍历
+        if (cursor.moveToFirst()) {
+            int count = cursor.getInt(cursor.getColumnIndex("count(money)"));
+            total = count;
+        }
+
+        return total;
+    }
+
+
+    /*
      * 获取某一年的支出或者收入的总金额,传入kind ：支出----0  收入----1
      */
     public static float getSumMoneyOneYear(int year, int kind) {
@@ -231,5 +252,28 @@ public class DBManger {
         String sql = "delete from accounttb";
         db.execSQL(sql);
     }
+
+    /*
+     * 查询指定年份和月份的收入或支出每一种类型的总钱数
+     * */
+    public static List<ChartItemBean> getChartListFromAccounttb(int year, int month, int kind) {
+        List<ChartItemBean> list = new ArrayList<>();
+
+        float sumMoneyOneMonth = getSumMoneyOneMonth(year, month, kind);//求出支出或者收入总钱数
+        String sql = "select typename,sImageId,sum(money)as total from accounttb where year=? and month=? and kind=? group by typename order by total desc";
+        Cursor cursor = db.rawQuery(sql, new String[]{year + "", month + "", kind + ""});
+        while (cursor.moveToNext()) {
+            String typename = cursor.getString(cursor.getColumnIndex("typename"));
+            int sImageId = cursor.getInt(cursor.getColumnIndex("sImageId"));
+            float total = cursor.getFloat(cursor.getColumnIndex("total"));
+            //计算所占百分比  total/sumMonth
+            float ratio = FloatUtils.div(total, sumMoneyOneMonth);
+            ChartItemBean bean = new ChartItemBean(sImageId, typename, ratio, total);
+            list.add(bean);
+        }
+
+        return list;
+    }
+
 
 }

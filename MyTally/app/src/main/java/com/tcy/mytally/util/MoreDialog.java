@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 
 import com.tcy.mytally.AboutActivity;
 import com.tcy.mytally.HistoryActivity;
+import com.tcy.mytally.MonthChartActivity;
 import com.tcy.mytally.R;
 import com.tcy.mytally.RecordActivity;
 import com.tcy.mytally.SettingActivity;
@@ -69,7 +70,8 @@ public class MoreDialog extends Dialog implements View.OnClickListener {
                 getContext().startActivity(intent);
                 break;
             case R.id.dialog_more_btn_info:
-
+                intent.setClass(getContext(), MonthChartActivity.class);
+                getContext().startActivity(intent);
                 break;
         }
         cancel();

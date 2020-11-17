@@ -27,4 +27,7 @@ public class InComeFragment extends BaseRecordFragment {
         accountBean.setKind(1);
         DBManger.insertItemToAccounttb(accountBean);
     }
+
+
+
 }

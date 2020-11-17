@@ -59,6 +59,22 @@ public class MonthChartActivity extends AppCompatActivity {
         //初始化Fragment
         initFrag();
 
+        //让pager和按钮联动
+        setVpSelectListener();
+
+    }
+
+    /*让pager和按钮联动*/
+    private void setVpSelectListener() {
+        //SimpleOnPageChangeListener想要重写就重新，不想重写就不用重写
+        chartVp.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+
+            //onPageSelected看谁被选中了
+            @Override
+            public void onPageSelected(int position) {
+                setButtonStyle(position);
+            }
+        });
     }
 
     /*初始化Fragment*/
@@ -140,6 +156,8 @@ public class MonthChartActivity extends AppCompatActivity {
                 MonthChartActivity.this.selectPos = selPos;
                 MonthChartActivity.this.selectMonth = month;
                 initStatistic(year, month);
+                incomeChartFragment.setDate(year, month);
+                outcomeChartFragment.setDate(year, month);
             }
         });
     }

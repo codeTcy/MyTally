@@ -13,19 +13,20 @@ import com.tcy.mytally.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class OutcomeChartFragment extends Fragment {
+public class OutcomeChartFragment extends BaseChartFragment {
 
-
-    public OutcomeChartFragment() {
-        // Required empty public constructor
-    }
-
+    int kind = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_income_chart, container, false);
+    public void onResume() {
+        super.onResume();
+        loadData(year, month, kind);
+
     }
 
+    @Override
+    public void setDate(int year, int month) {
+        super.setDate(year, month);
+        loadData(year, month, kind);
+    }
 }
